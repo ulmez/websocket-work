@@ -72,7 +72,6 @@ angular.module('whiteboardApp')
 			if ($scope.errorWhiteboardNameMessage === '') {
 				$scope.whiteboardName = '';
 				whiteboard.addWhiteboard(whiteboardName, $scope.posts);
-				$scope.stateChange = 1;
 			}
 		};
 
@@ -82,7 +81,6 @@ angular.module('whiteboardApp')
 
 			if (conf) {
 				whiteboard.deleteWhiteboard(obj.whiteboard);
-				$scope.stateChange = 2;
 			}
 		};
 
@@ -102,7 +100,6 @@ angular.module('whiteboardApp')
 				$scope.showUpdateWhiteboard = 0;
 				$scope.showErrorMessage = false;
 				whiteboard.updateWhiteboard(name, obj, $scope.posts);
-				$scope.stateChange = 3;
 			}
 		};
 	});

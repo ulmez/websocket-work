@@ -40,7 +40,6 @@ angular.module('whiteboardApp')
 
 		$scope.backToWhiteboards = function () {
 			$location.path('/');
-			$scope.stateChange = 1;
 		};
 
 		$scope.titleClicked = function (note) {
@@ -87,7 +86,6 @@ angular.module('whiteboardApp')
 			$scope.specificNote.title = textUpdate;
 
 			whiteboard.updateItem($scope.specificNote);
-			$scope.stateChange = 2;
 		};
 
 		$scope.updateInformation = function (textUpdate) {
@@ -95,7 +93,6 @@ angular.module('whiteboardApp')
 			$scope.specificNote.information = textUpdate;
 
 			whiteboard.updateItem($scope.specificNote);
-			$scope.stateChange = 3;
 		};
 
 		$scope.updateColor = function () {
@@ -122,7 +119,6 @@ angular.module('whiteboardApp')
 			$scope.colorShowIt = 0;
 
 			whiteboard.updateItem($scope.specificNote);
-			$scope.stateChange = 4;
 		};
 
 		$scope.deleteNote = function (note) {
@@ -130,7 +126,6 @@ angular.module('whiteboardApp')
 
 			if (deleteNotePrivate) {
 				whiteboard.deleteItem(note);
-				$scope.stateChange = 5;
 			}
 		};
 
@@ -173,6 +168,5 @@ angular.module('whiteboardApp')
 			$scope.selectedColor = 'yellow';
 			document.getElementById('yellow').checked = true;
 			$scope.signupform.$setPristine();
-			$scope.stateChange = 6;
 		};
 	});
