@@ -1,7 +1,12 @@
 package se.ulme.dispatch;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -36,21 +41,34 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 		Session session = sf.openSession();
 		Transaction tx = session.beginTransaction();
 		
-		String json = mo.getOperate().substring(0, mo.getOperate().lastIndexOf(",")) + "}";
-		ObjectMapper mapper = new ObjectMapper();
-		PostItConvert pc = mapper.readValue(json, PostItConvert.class);
-		PostIt p = (PostIt) session.get(PostIt.class, pc.getId());
-		Color c = (Color) session.get(Color.class, pc.getId());
-		
-		c.setYellow(pc.getColor().getYellow());
-		c.setGreen(pc.getColor().getGreen());
-		c.setBlue(pc.getColor().getBlue());
-		c.setRed(pc.getColor().getRed());
-		
-		p.setTitle(pc.getTitle());
-		p.setInformation(pc.getInformation());
+		StringReader reader = new StringReader(mo.getOperate());
+        JsonReader jsonReader = Json.createReader(reader);
+        JsonObject jsonObject = jsonReader.readObject();
+        
+        jsonReader.close();
+        
+        String title = jsonObject.getString("title");
+        String information = jsonObject.getString("information");
+        
+        int id = jsonObject.getInt("id");
+        boolean yellow = jsonObject.getJsonObject("color").getBoolean("yellow");
+        boolean green = jsonObject.getJsonObject("color").getBoolean("green");
+        boolean blue = jsonObject.getJsonObject("color").getBoolean("blue");
+        boolean red = jsonObject.getJsonObject("color").getBoolean("red");
+        
+        
+        PostIt p = (PostIt) session.get(PostIt.class, id);
+        Color c = (Color) session.get(Color.class, id);
+        
+        c.setYellow(yellow);
+		c.setGreen(green);
+		c.setBlue(blue);
+		c.setRed(red);
+        
+		p.setTitle(title);
+		p.setInformation(information);
 		p.setColor(c);
-		
+        
 		session.update(p);
 		
 		tx.commit();
@@ -69,11 +87,14 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 		Session session = sf.openSession();
 		Transaction tx = session.beginTransaction();
 		
-		String json = mo.getOperate().substring(0, mo.getOperate().lastIndexOf(",")) + "}";
-		
-		ObjectMapper mapper = new ObjectMapper();
-		PostItConvert pc = mapper.readValue(json, PostItConvert.class);
-		PostIt p = (PostIt) session.get(PostIt.class, pc.getId());
+		StringReader reader = new StringReader(mo.getOperate());
+        JsonReader jsonReader = Json.createReader(reader);
+        JsonObject jsonObject = jsonReader.readObject();
+        
+        jsonReader.close();
+        
+        int id = jsonObject.getInt("id");
+        PostIt p = (PostIt) session.get(PostIt.class, id);
 		
 		session.delete(p);
 		
@@ -93,6 +114,12 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 		Session session = sf.openSession();
 		Transaction tx = session.beginTransaction();
 		
+		StringReader reader = new StringReader(mo.getNote());
+        JsonReader jsonReader = Json.createReader(reader);
+        JsonObject jsonObject = jsonReader.readObject();
+        
+        jsonReader.close();
+		
 		Query query = session.createQuery("SELECT w FROM Whiteboard w WHERE w.whiteboard=" + "'" + mo.getOperate() + "'");
 		List<?> whiteboards = query.list();
 		Whiteboard wb = null;
@@ -101,17 +128,19 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 			wb = (Whiteboard) session.get(Whiteboard.class, ((Whiteboard) whiteboards.get(i)).getId());
 		}
 		
-		ObjectMapper mapper = new ObjectMapper();
-		PostItConvert pc = mapper.readValue(mo.getNote(), PostItConvert.class);
-		PostIt p = new PostIt(pc.getTitle(), pc.getInformation(), wb);
+		String title = jsonObject.getString("title");
+		String information = jsonObject.getString("information");
+		
+		boolean yellow = jsonObject.getJsonObject("color").getBoolean("yellow");
+		boolean green = jsonObject.getJsonObject("color").getBoolean("green");
+		boolean blue = jsonObject.getJsonObject("color").getBoolean("blue");
+		boolean red = jsonObject.getJsonObject("color").getBoolean("red");
+		
+		PostIt p = new PostIt(title, information, wb);
 		
 		session.save(p);
 		session.persist(p);
 		
-		boolean yellow = pc.getColor().getYellow();
-		boolean green = pc.getColor().getGreen();
-		boolean blue = pc.getColor().getBlue();
-		boolean red = pc.getColor().getRed();
 		Color c = new Color(yellow, green, blue, red, p.getId());
 		
 		session.save(c);
