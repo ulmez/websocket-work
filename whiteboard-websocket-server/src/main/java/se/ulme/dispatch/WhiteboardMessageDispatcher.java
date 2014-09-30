@@ -1,7 +1,17 @@
 package se.ulme.dispatch;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.List;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonReader;
+import javax.json.JsonWriter;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -11,15 +21,10 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
+import se.ulme.converter.PostItConvert;
 import se.ulme.converter.WhiteboardConvert;
 import se.ulme.database.Data;
 import se.ulme.hibernate.Whiteboard;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 public class WhiteboardMessageDispatcher implements Get, Post, Delete, Put {
 	private MessageOperator mo;
@@ -29,14 +34,69 @@ public class WhiteboardMessageDispatcher implements Get, Post, Delete, Put {
 	}
 	
 	@Override
-	public String get() throws JsonProcessingException {
+	public String get() {
 		String json;
 		if(mo.getOperate().equals("")) {
-			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-			json = ow.writeValueAsString(Data.convertedAllWhiteboards());
+//			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+//			json = ow.writeValueAsString(Data.convertedAllWhiteboards());
+
+			JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+			
+			for(WhiteboardConvert l : Data.convertedAllWhiteboards()) {
+				JsonObjectBuilder builder = Json.createObjectBuilder();
+				builder.add("id", l.getId());
+				builder.add("whiteboard", l.getWhiteboard());
+				builder.add("db", Json.createArrayBuilder());
+				arrayBuilder.add(builder);
+			}
+			
+			JsonArray whiteboards = arrayBuilder.build();
+
+	        StringWriter sw = new StringWriter();
+	        JsonWriter jw = Json.createWriter(sw);
+	        jw.writeArray(whiteboards);
+	        jw.close();
+	        
+	        json = sw.toString();
 		} else {
-			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-			json = ow.writeValueAsString(Data.convertedWhiteboard(mo.getOperate()));
+//			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+//			json = ow.writeValueAsString(Data.convertedWhiteboard(mo.getOperate()));
+			
+			JsonObjectBuilder builder = Json.createObjectBuilder();
+			JsonObjectBuilder builderPostIt = Json.createObjectBuilder();
+			JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+			
+			WhiteboardConvert wc = Data.convertedWhiteboard(mo.getOperate());
+			
+			JsonObjectBuilder colorBuilder = Json.createObjectBuilder();
+			for(PostItConvert pc : wc.getDb()) {
+				JsonObject c = colorBuilder.add("id", pc.getId())
+										   .add("yellow", pc.getColor().getYellow())
+										   .add("green", pc.getColor().getGreen())
+										   .add("blue", pc.getColor().getBlue())
+										   .add("red", pc.getColor().getRed())
+										   .build();
+				
+				arrayBuilder.add(builderPostIt.add("id", pc.getId())
+											  .add("title", pc.getTitle())
+											  .add("information", pc.getInformation())
+											  .add("color", c));
+			}
+			
+			JsonArray postIts = arrayBuilder.build();
+			
+			builder.add("id", wc.getId());
+			builder.add("whiteboard", wc.getWhiteboard());
+			builder.add("db", postIts);
+			
+			JsonObject whiteboard = builder.build();
+			
+			StringWriter sw = new StringWriter();
+	        JsonWriter jw = Json.createWriter(sw);
+	        jw.writeObject(whiteboard);
+	        jw.close();
+	        
+	        json = sw.toString();
 		}
 		
 		return json;
@@ -90,23 +150,25 @@ public class WhiteboardMessageDispatcher implements Get, Post, Delete, Put {
 	}
 	
 	@Override
-	public void put(javax.websocket.Session userSession) throws JsonParseException, JsonMappingException, IOException {
+	public void put(javax.websocket.Session userSession) throws IOException {
 		Configuration conf = new Configuration().configure();
 		ServiceRegistry sr = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
 		SessionFactory sf = conf.buildSessionFactory(sr);
 		Session session = sf.openSession();
 		Transaction tx = session.beginTransaction();
 		
-		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-		String json = ow.writeValueAsString(mo.getOperate());
-		json = json.substring(1, json.lastIndexOf(",")) + "}";
-		json = json.replace("\\", "");
-		
-		ObjectMapper mapper = new ObjectMapper();
-		WhiteboardConvert wbc = mapper.readValue(json, WhiteboardConvert.class);
-		Whiteboard wb = (Whiteboard) session.get(Whiteboard.class, wbc.getId());
+		StringReader reader = new StringReader(mo.getOperate());
+        JsonReader jsonReader = Json.createReader(reader);
+        JsonObject jsonObject = jsonReader.readObject();
+        
+        jsonReader.close();
+        
+        int id = jsonObject.getInt("id");
+        String whiteboard = jsonObject.getString("whiteboard");
+		Whiteboard wb = (Whiteboard) session.get(Whiteboard.class, id);
 
-		wb.setWhiteboard(wbc.getWhiteboard());
+		wb.setWhiteboard(whiteboard);
+		
 		session.update(wb);
 		
 		tx.commit();

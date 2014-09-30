@@ -16,6 +16,9 @@ import se.ulme.converter.WhiteboardConvert;
 import se.ulme.hibernate.Color;
 import se.ulme.hibernate.Whiteboard;
 
+/**
+ * Is used 
+ */
 public class Data {
 	public static WhiteboardConvert convertedWhiteboard(Whiteboard w) {
 		List<PostItConvert> pits1 = new ArrayList<>();

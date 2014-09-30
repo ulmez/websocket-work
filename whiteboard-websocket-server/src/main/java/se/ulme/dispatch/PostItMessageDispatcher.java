@@ -16,15 +16,9 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
-import se.ulme.converter.PostItConvert;
 import se.ulme.hibernate.Color;
 import se.ulme.hibernate.PostIt;
 import se.ulme.hibernate.Whiteboard;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 	private MessageOperator mo;
@@ -34,7 +28,7 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 	}
 	
 	@Override
-	public void put(javax.websocket.Session userSession) throws JsonParseException, JsonMappingException, IOException {
+	public void put(javax.websocket.Session userSession) throws IOException {
 		Configuration conf = new Configuration().configure();
 		ServiceRegistry sr = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
 		SessionFactory sf = conf.buildSessionFactory(sr);
@@ -154,7 +148,7 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 	}
 
 	@Override
-	public String get() throws JsonProcessingException {
+	public String get() {
 		// TODO Auto-generated method stub
 		return null;
 	}

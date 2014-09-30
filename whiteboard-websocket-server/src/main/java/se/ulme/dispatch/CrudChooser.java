@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.websocket.Session;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,7 +18,7 @@ public class CrudChooser {
 		mo = mapper.readValue(message, MessageOperator.class);
 	}
 	
-	public void operate() throws JsonProcessingException, IOException {
+	public void operate() throws IOException {
 		if(mo.getType().equals("get")) {
 			Get wmd = new WhiteboardMessageDispatcher(mo);
 			userSession.getBasicRemote().sendText(wmd.get());
