@@ -8,6 +8,9 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * A switch class that directs what will happen depending on message from the client
+ */
 public class CrudChooser {
 	private ObjectMapper mapper = new ObjectMapper();
 	private MessageOperator mo;

@@ -17,9 +17,10 @@ import se.ulme.hibernate.Color;
 import se.ulme.hibernate.Whiteboard;
 
 /**
- * Is used 
+ * Is used to convert the format from my hibernate classes to fit with my AngularJS client
  */
 public class Data {
+	// Gives one specific whiteboardConvert from my Whiteboard hibernate class
 	public static WhiteboardConvert convertedWhiteboard(Whiteboard w) {
 		List<PostItConvert> pits1 = new ArrayList<>();
 		
@@ -38,6 +39,7 @@ public class Data {
         return wbt1;
 	}
 	
+	// Gives all the Whiteboards in WhiteboardConvert format from the Whiteboards in hibernate format
 	public static List<WhiteboardConvert> convertedAllWhiteboards() {
 		Configuration conf = new Configuration().configure();
 		ServiceRegistry sr = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
@@ -61,6 +63,7 @@ public class Data {
         return wbts;
 	}
 	
+	// Gives one converted Whiteboard from whiteboard name
 	public static WhiteboardConvert convertedWhiteboard(String whiteboardName) {
 		Configuration conf = new Configuration().configure();
 		ServiceRegistry sr = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();

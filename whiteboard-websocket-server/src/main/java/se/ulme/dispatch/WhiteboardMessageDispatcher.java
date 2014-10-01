@@ -26,6 +26,9 @@ import se.ulme.converter.WhiteboardConvert;
 import se.ulme.database.Data;
 import se.ulme.hibernate.Whiteboard;
 
+/**
+ * Taking care of CRUD with whiteboards
+ */
 public class WhiteboardMessageDispatcher implements Get, Post, Delete, Put {
 	private MessageOperator mo;
 	
@@ -33,13 +36,11 @@ public class WhiteboardMessageDispatcher implements Get, Post, Delete, Put {
 		this.mo = mo;
 	}
 	
+	// Get all whiteboards or only a specific whiteboard and generate a string in json format
 	@Override
 	public String get() {
 		String json;
 		if(mo.getOperate().equals("")) {
-//			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-//			json = ow.writeValueAsString(Data.convertedAllWhiteboards());
-
 			JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
 			
 			for(WhiteboardConvert l : Data.convertedAllWhiteboards()) {
@@ -59,9 +60,6 @@ public class WhiteboardMessageDispatcher implements Get, Post, Delete, Put {
 	        
 	        json = sw.toString();
 		} else {
-//			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-//			json = ow.writeValueAsString(Data.convertedWhiteboard(mo.getOperate()));
-			
 			JsonObjectBuilder builder = Json.createObjectBuilder();
 			JsonObjectBuilder builderPostIt = Json.createObjectBuilder();
 			JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
@@ -102,6 +100,7 @@ public class WhiteboardMessageDispatcher implements Get, Post, Delete, Put {
 		return json;
 	}
 	
+	// Post a whiteboard to the database with hibernate class Whiteboard
 	@Override
 	public void post(javax.websocket.Session userSession) throws IOException {
 		Configuration conf = new Configuration().configure();
@@ -123,6 +122,7 @@ public class WhiteboardMessageDispatcher implements Get, Post, Delete, Put {
 		}
 	}
 	
+	// Delete a whiteboard from the database with hibernate class Whiteboard on whiteboard name as parameter
 	@Override
 	public void delete(javax.websocket.Session userSession) throws IOException {
 		Configuration conf = new Configuration().configure();
@@ -149,6 +149,7 @@ public class WhiteboardMessageDispatcher implements Get, Post, Delete, Put {
 		}
 	}
 	
+	// Change name of a whiteboard in database with hibernate class Whiteboard
 	@Override
 	public void put(javax.websocket.Session userSession) throws IOException {
 		Configuration conf = new Configuration().configure();

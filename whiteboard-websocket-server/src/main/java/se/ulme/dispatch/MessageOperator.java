@@ -1,5 +1,8 @@
 package se.ulme.dispatch;
 
+/**
+ * Used to direct what happens in CrudChooser class
+ */
 public class MessageOperator {
 	private String type;
 	private String operate;

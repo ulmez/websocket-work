@@ -20,6 +20,9 @@ import se.ulme.hibernate.Color;
 import se.ulme.hibernate.PostIt;
 import se.ulme.hibernate.Whiteboard;
 
+/**
+ * Taking care of CRUD with postit notes
+ */
 public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 	private MessageOperator mo;
 	
@@ -27,6 +30,7 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 		this.mo = mo;
 	}
 	
+	// Used to update title, information and color in the postit note
 	@Override
 	public void put(javax.websocket.Session userSession) throws IOException {
 		Configuration conf = new Configuration().configure();
@@ -50,7 +54,6 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
         boolean blue = jsonObject.getJsonObject("color").getBoolean("blue");
         boolean red = jsonObject.getJsonObject("color").getBoolean("red");
         
-        
         PostIt p = (PostIt) session.get(PostIt.class, id);
         Color c = (Color) session.get(Color.class, id);
         
@@ -73,6 +76,7 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 		}
 	}
 
+	// Used to delete postit note
 	@Override
 	public void delete(javax.websocket.Session userSession) throws IOException {
 		Configuration conf = new Configuration().configure();
@@ -100,6 +104,7 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 		}
 	}
 
+	// Used to insert a postit note
 	@Override
 	public void post(javax.websocket.Session userSession) throws IOException {
 		Configuration conf = new Configuration().configure();
@@ -114,6 +119,7 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
         
         jsonReader.close();
 		
+        // Get whiteboard on name parameter here from hibernate class Whiteboard
 		Query query = session.createQuery("SELECT w FROM Whiteboard w WHERE w.whiteboard=" + "'" + mo.getOperate() + "'");
 		List<?> whiteboards = query.list();
 		Whiteboard wb = null;
