@@ -23,8 +23,8 @@ import org.hibernate.service.ServiceRegistry;
 
 import se.ulme.converter.PostItConvert;
 import se.ulme.converter.WhiteboardConvert;
-import se.ulme.database.Data;
 import se.ulme.hibernate.Whiteboard;
+import se.ulme.util.Data;
 
 /**
  * Taking care of CRUD with whiteboards

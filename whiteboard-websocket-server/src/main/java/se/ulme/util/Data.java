@@ -1,4 +1,4 @@
-package se.ulme.database;
+package se.ulme.util;
 
 import java.util.ArrayList;
 import java.util.List;
