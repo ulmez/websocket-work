@@ -16,24 +16,26 @@ import se.ulme.dispatch.CrudChooser;
 
 @ServerEndpoint("/serverendpoint")
 public class WebsocketServerEndPoint {
-	static Set<Session> chatroomUsers = Collections.synchronizedSet(new HashSet<Session>());
-	
+	static Set<Session> chatroomUsers = Collections
+			.synchronizedSet(new HashSet<Session>());
+
 	@OnOpen
 	public void handleOpen(Session userSession) throws IOException {
 
 	}
-	
+
 	@OnMessage
-	public void handleMessage(String message, Session userSession) throws IOException {
+	public void handleMessage(String message, Session userSession)
+			throws IOException {
 		CrudChooser cc = new CrudChooser(message, userSession);
 		cc.operate();
 	}
-	
+
 	@OnClose
 	public void handleClose(Session userSession) {
-		
+
 	}
-	
+
 	@OnError
 	public void handleError(Throwable t) {
 		t.printStackTrace();

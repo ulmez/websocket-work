@@ -13,45 +13,45 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "postit")
-public class PostIt  {
+public class PostIt {
 
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
 	private int id;
-	
+
 	@Lob
 	@Column(name = "information")
 	private String information;
-	
+
 	@Column(name = "title")
 	private String title;
 
-	//bi-directional one-to-one association to Color
+	// bi-directional one-to-one association to Color
 	@JsonIgnore
-	@OneToOne(mappedBy="postit")
+	@OneToOne(mappedBy = "postit")
 	private Color color;
 
-	//bi-directional many-to-one association to Whiteboard
+	// bi-directional many-to-one association to Whiteboard
 	@JsonIgnore
 	@ManyToOne
 	private Whiteboard whiteboard;
 
 	public PostIt() {
 	}
-	
+
 	public PostIt(String title, String information, Color color) {
 		this.title = title;
 		this.information = information;
 		this.color = color;
 	}
-	
+
 	public PostIt(String title, String information, Whiteboard whiteboard) {
 		this.title = title;
 		this.information = information;
 		this.whiteboard = whiteboard;
 	}
-	
+
 	public PostIt(String title, String information) {
 		this.title = title;
 		this.information = information;

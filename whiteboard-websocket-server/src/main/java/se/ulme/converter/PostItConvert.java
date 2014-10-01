@@ -7,25 +7,25 @@ public class PostItConvert {
 	private String title;
 	private String information;
 	private Color color;
-	
+
 	public PostItConvert() {
-		
+
 	}
-	
+
 	public PostItConvert(String title, String information, Color color) {
 		this.id = 0;
 		this.title = title;
 		this.information = information;
 		this.color = color;
 	}
-	
+
 	public PostItConvert(int id, String title, String information, Color color) {
 		this.id = id;
 		this.title = title;
 		this.information = information;
 		this.color = color;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -49,7 +49,7 @@ public class PostItConvert {
 	public void setInformation(String information) {
 		this.information = information;
 	}
-	
+
 	public Color getColor() {
 		return color;
 	}

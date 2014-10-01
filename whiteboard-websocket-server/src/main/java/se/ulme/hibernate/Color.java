@@ -11,33 +11,33 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "color")
-public class Color  {
-	
+public class Color {
+
 	@Id
 	@Column(name = "id")
 	private int id;
-	
+
 	@Column(nullable = false, columnDefinition = "BOOLEAN")
 	private boolean yellow;
-	
+
 	@Column(nullable = false, columnDefinition = "BOOLEAN")
 	private boolean green;
-	
+
 	@Column(nullable = false, columnDefinition = "BOOLEAN")
 	private boolean blue;
-	
+
 	@Column(nullable = false, columnDefinition = "BOOLEAN")
 	private boolean red;
 
-	//bi-directional one-to-one association to PostIt
+	// bi-directional one-to-one association to PostIt
 	@JsonIgnore
 	@OneToOne
-	@JoinColumn(name="id")
+	@JoinColumn(name = "id")
 	private PostIt postit;
 
 	public Color() {
 	}
-	
+
 	public Color(boolean yellow, boolean green, boolean blue, boolean red) {
 		this.yellow = yellow;
 		this.green = green;
@@ -45,8 +45,9 @@ public class Color  {
 		this.red = red;
 		this.id = 0;
 	}
-	
-	public Color(boolean yellow, boolean green, boolean blue, boolean red, int id) {
+
+	public Color(boolean yellow, boolean green, boolean blue, boolean red,
+			int id) {
 		this.yellow = yellow;
 		this.green = green;
 		this.blue = blue;

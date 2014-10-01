@@ -9,38 +9,40 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * A switch class that directs what will happen depending on message from the client
+ * A switch class that directs what will happen depending on message from the
+ * client
  */
 public class CrudChooser {
 	private ObjectMapper mapper = new ObjectMapper();
 	private MessageOperator mo;
 	private Session userSession;
-	
-	public CrudChooser(String message, Session userSession) throws JsonParseException, JsonMappingException, IOException {
+
+	public CrudChooser(String message, Session userSession)
+			throws JsonParseException, JsonMappingException, IOException {
 		this.userSession = userSession;
 		mo = mapper.readValue(message, MessageOperator.class);
 	}
-	
+
 	public void operate() throws IOException {
-		if(mo.getType().equals("get")) {
+		if (mo.getType().equals("get")) {
 			Get wmd = new WhiteboardMessageDispatcher(mo);
 			userSession.getBasicRemote().sendText(wmd.get());
-		} else if(mo.getType().equals("post")) {
+		} else if (mo.getType().equals("post")) {
 			Post wmd = new WhiteboardMessageDispatcher(mo);
 			wmd.post(userSession);
-		} else if(mo.getType().equals("delete")) {
+		} else if (mo.getType().equals("delete")) {
 			Delete wmd = new WhiteboardMessageDispatcher(mo);
 			wmd.delete(userSession);
-		} else if(mo.getType().equals("put")) {
+		} else if (mo.getType().equals("put")) {
 			Put wmd = new WhiteboardMessageDispatcher(mo);
 			wmd.put(userSession);
-		} else if(mo.getType().equals("postnote")) {
+		} else if (mo.getType().equals("postnote")) {
 			Post pmd = new PostItMessageDispatcher(mo);
 			pmd.post(userSession);
-		} else if(mo.getType().equals("putnote")) {
+		} else if (mo.getType().equals("putnote")) {
 			Put pmd = new PostItMessageDispatcher(mo);
 			pmd.put(userSession);
-		} else if(mo.getType().equals("deletenote")) {
+		} else if (mo.getType().equals("deletenote")) {
 			Delete pmd = new PostItMessageDispatcher(mo);
 			pmd.delete(userSession);
 		}

@@ -6,17 +6,17 @@ public class WhiteboardConvert {
 	private int id;
 	private String whiteboard;
 	private List<PostItConvert> db;
-	
+
 	public WhiteboardConvert() {
-		
+
 	}
-	
+
 	public WhiteboardConvert(String whiteboard, List<PostItConvert> db, int id) {
 		this.whiteboard = whiteboard;
 		this.db = db;
 		this.id = id;
 	}
-	
+
 	public int getId() {
 		return id;
 	}

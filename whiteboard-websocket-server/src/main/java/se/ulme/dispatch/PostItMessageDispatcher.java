@@ -25,53 +25,54 @@ import se.ulme.hibernate.Whiteboard;
  */
 public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 	private MessageOperator mo;
-	
+
 	public PostItMessageDispatcher(MessageOperator mo) {
 		this.mo = mo;
 	}
-	
+
 	// Used to update title, information and color in the postit note
 	@Override
 	public void put(javax.websocket.Session userSession) throws IOException {
 		Configuration conf = new Configuration().configure();
-		ServiceRegistry sr = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
+		ServiceRegistry sr = new StandardServiceRegistryBuilder()
+				.applySettings(conf.getProperties()).build();
 		SessionFactory sf = conf.buildSessionFactory(sr);
 		Session session = sf.openSession();
 		Transaction tx = session.beginTransaction();
-		
+
 		StringReader reader = new StringReader(mo.getOperate());
-        JsonReader jsonReader = Json.createReader(reader);
-        JsonObject jsonObject = jsonReader.readObject();
-        
-        jsonReader.close();
-        
-        String title = jsonObject.getString("title");
-        String information = jsonObject.getString("information");
-        
-        int id = jsonObject.getInt("id");
-        boolean yellow = jsonObject.getJsonObject("color").getBoolean("yellow");
-        boolean green = jsonObject.getJsonObject("color").getBoolean("green");
-        boolean blue = jsonObject.getJsonObject("color").getBoolean("blue");
-        boolean red = jsonObject.getJsonObject("color").getBoolean("red");
-        
-        PostIt p = (PostIt) session.get(PostIt.class, id);
-        Color c = (Color) session.get(Color.class, id);
-        
-        c.setYellow(yellow);
+		JsonReader jsonReader = Json.createReader(reader);
+		JsonObject jsonObject = jsonReader.readObject();
+
+		jsonReader.close();
+
+		String title = jsonObject.getString("title");
+		String information = jsonObject.getString("information");
+
+		int id = jsonObject.getInt("id");
+		boolean yellow = jsonObject.getJsonObject("color").getBoolean("yellow");
+		boolean green = jsonObject.getJsonObject("color").getBoolean("green");
+		boolean blue = jsonObject.getJsonObject("color").getBoolean("blue");
+		boolean red = jsonObject.getJsonObject("color").getBoolean("red");
+
+		PostIt p = (PostIt) session.get(PostIt.class, id);
+		Color c = (Color) session.get(Color.class, id);
+
+		c.setYellow(yellow);
 		c.setGreen(green);
 		c.setBlue(blue);
 		c.setRed(red);
-        
+
 		p.setTitle(title);
 		p.setInformation(information);
 		p.setColor(c);
-        
+
 		session.update(p);
-		
+
 		tx.commit();
-        sf.close();
-        
-        for(javax.websocket.Session s : userSession.getOpenSessions()) {
+		sf.close();
+
+		for (javax.websocket.Session s : userSession.getOpenSessions()) {
 			s.getBasicRemote().sendText("refresh");
 		}
 	}
@@ -80,26 +81,27 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 	@Override
 	public void delete(javax.websocket.Session userSession) throws IOException {
 		Configuration conf = new Configuration().configure();
-		ServiceRegistry sr = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
+		ServiceRegistry sr = new StandardServiceRegistryBuilder()
+				.applySettings(conf.getProperties()).build();
 		SessionFactory sf = conf.buildSessionFactory(sr);
 		Session session = sf.openSession();
 		Transaction tx = session.beginTransaction();
-		
+
 		StringReader reader = new StringReader(mo.getOperate());
-        JsonReader jsonReader = Json.createReader(reader);
-        JsonObject jsonObject = jsonReader.readObject();
-        
-        jsonReader.close();
-        
-        int id = jsonObject.getInt("id");
-        PostIt p = (PostIt) session.get(PostIt.class, id);
-		
+		JsonReader jsonReader = Json.createReader(reader);
+		JsonObject jsonObject = jsonReader.readObject();
+
+		jsonReader.close();
+
+		int id = jsonObject.getInt("id");
+		PostIt p = (PostIt) session.get(PostIt.class, id);
+
 		session.delete(p);
-		
+
 		tx.commit();
-        sf.close();
-        
-        for(javax.websocket.Session s : userSession.getOpenSessions()) {
+		sf.close();
+
+		for (javax.websocket.Session s : userSession.getOpenSessions()) {
 			s.getBasicRemote().sendText("refresh");
 		}
 	}
@@ -108,47 +110,51 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 	@Override
 	public void post(javax.websocket.Session userSession) throws IOException {
 		Configuration conf = new Configuration().configure();
-		ServiceRegistry sr = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
+		ServiceRegistry sr = new StandardServiceRegistryBuilder()
+				.applySettings(conf.getProperties()).build();
 		SessionFactory sf = conf.buildSessionFactory(sr);
 		Session session = sf.openSession();
 		Transaction tx = session.beginTransaction();
-		
+
 		StringReader reader = new StringReader(mo.getNote());
-        JsonReader jsonReader = Json.createReader(reader);
-        JsonObject jsonObject = jsonReader.readObject();
-        
-        jsonReader.close();
-		
-        // Get whiteboard on name parameter here from hibernate class Whiteboard
-		Query query = session.createQuery("SELECT w FROM Whiteboard w WHERE w.whiteboard=" + "'" + mo.getOperate() + "'");
+		JsonReader jsonReader = Json.createReader(reader);
+		JsonObject jsonObject = jsonReader.readObject();
+
+		jsonReader.close();
+
+		// Get whiteboard on name parameter here from hibernate class Whiteboard
+		Query query = session
+				.createQuery("SELECT w FROM Whiteboard w WHERE w.whiteboard="
+						+ "'" + mo.getOperate() + "'");
 		List<?> whiteboards = query.list();
 		Whiteboard wb = null;
-		
-		for(int i = 0; i < whiteboards.size(); i++) {
-			wb = (Whiteboard) session.get(Whiteboard.class, ((Whiteboard) whiteboards.get(i)).getId());
+
+		for (int i = 0; i < whiteboards.size(); i++) {
+			wb = (Whiteboard) session.get(Whiteboard.class,
+					((Whiteboard) whiteboards.get(i)).getId());
 		}
-		
+
 		String title = jsonObject.getString("title");
 		String information = jsonObject.getString("information");
-		
+
 		boolean yellow = jsonObject.getJsonObject("color").getBoolean("yellow");
 		boolean green = jsonObject.getJsonObject("color").getBoolean("green");
 		boolean blue = jsonObject.getJsonObject("color").getBoolean("blue");
 		boolean red = jsonObject.getJsonObject("color").getBoolean("red");
-		
+
 		PostIt p = new PostIt(title, information, wb);
-		
+
 		session.save(p);
 		session.persist(p);
-		
+
 		Color c = new Color(yellow, green, blue, red, p.getId());
-		
+
 		session.save(c);
-		
+
 		tx.commit();
-        sf.close();
-        
-        for(javax.websocket.Session s : userSession.getOpenSessions()) {
+		sf.close();
+
+		for (javax.websocket.Session s : userSession.getOpenSessions()) {
 			s.getBasicRemote().sendText("refresh");
 		}
 	}
@@ -158,5 +164,4 @@ public class PostItMessageDispatcher implements Get, Post, Delete, Put {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
