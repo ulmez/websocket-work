@@ -1,4 +1,4 @@
-package se.ulme.dispatch;
+package se.ulme.dispatch.interfaces;
 
 import java.io.IOException;
 

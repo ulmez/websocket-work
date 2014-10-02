@@ -1,7 +1,11 @@
 package se.ulme.util;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -12,6 +16,15 @@ import org.hibernate.service.ServiceRegistry;
 
 import se.ulme.converter.PostItConvert;
 import se.ulme.converter.WhiteboardConvert;
+import se.ulme.dispatch.MessageOperator;
+import se.ulme.dispatch.interfaces.Command;
+import se.ulme.dispatch.postit.PostItMessageDeleteDispatcher;
+import se.ulme.dispatch.postit.PostItMessagePostDispatcher;
+import se.ulme.dispatch.postit.PostItMessagePutDispatcher;
+import se.ulme.dispatch.whiteboard.WhiteboardMessageDeleteDispatcher;
+import se.ulme.dispatch.whiteboard.WhiteboardMessageGetDispatcher;
+import se.ulme.dispatch.whiteboard.WhiteboardMessagePostDispatcher;
+import se.ulme.dispatch.whiteboard.WhiteboardMessagePutDispatcher;
 import se.ulme.hibernate.Color;
 import se.ulme.hibernate.Whiteboard;
 
@@ -93,5 +106,20 @@ public class Data {
 		sf.close();
 
 		return wbc;
+	}
+
+	public static void operate(javax.websocket.Session userSession,
+			MessageOperator mo) throws IOException {
+		Map<String, Command> chooser = new HashMap<>();
+
+		chooser.put("get", new WhiteboardMessageGetDispatcher(mo));
+		chooser.put("post", new WhiteboardMessagePostDispatcher(mo));
+		chooser.put("delete", new WhiteboardMessageDeleteDispatcher(mo));
+		chooser.put("put", new WhiteboardMessagePutDispatcher(mo));
+		chooser.put("postnote", new PostItMessagePostDispatcher(mo));
+		chooser.put("putnote", new PostItMessagePutDispatcher(mo));
+		chooser.put("deletenote", new PostItMessageDeleteDispatcher(mo));
+
+		chooser.get(mo.getType()).operate(userSession);
 	}
 }
