@@ -108,6 +108,8 @@ public class Data {
 		return wbc;
 	}
 
+	// Used to decide what the server should do depending on send messages from
+	// the client
 	public static void operate(javax.websocket.Session userSession,
 			MessageOperator mo) throws IOException {
 		Map<String, Command> chooser = new HashMap<>();
